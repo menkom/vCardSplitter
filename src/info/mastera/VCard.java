@@ -23,6 +23,19 @@ public class VCard {
 		this.lines = new ArrayList<>();
 	}
 
+	private void checkPath(String fileName) throws IOException {
+		File file = new File(fileName);
+		String dir = file.getCanonicalPath().replaceAll(file.getName(), "");
+
+		File fileDir = new File(dir);
+		if ((fileDir.exists() && fileDir.isFile())) {
+			System.out.println(String.format(ERROR_FILE_FOLDER, fileDir));
+		} else if (!fileDir.exists()) {
+			fileDir.mkdir();
+			System.out.println(String.format(FOLDER_CREATED, dir));
+		}
+	}
+
 	public VCard(List<String> lines) {
 		this.lines = lines;
 	}
@@ -62,19 +75,6 @@ public class VCard {
 			}
 		} catch (IOException e1) {
 			System.out.println(String.format(ERROR_IO_WRITE, fileName));
-		}
-	}
-
-	public void checkPath(String fileName) throws IOException {
-		File file = new File(fileName);
-		String dir = file.getCanonicalPath().replaceAll(file.getName(), "");
-
-		File fileDir = new File(dir);
-		if ((fileDir.exists() && fileDir.isFile())) {
-			System.out.println(String.format(ERROR_FILE_FOLDER, fileDir));
-		} else if (!fileDir.exists()) {
-			fileDir.mkdir();
-			System.out.println(String.format(FOLDER_CREATED, dir));
 		}
 	}
 

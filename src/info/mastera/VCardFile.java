@@ -22,6 +22,43 @@ public class VCardFile {
 
 	private List<VCard> vCards = new ArrayList<>();
 
+	private String getFolderName(File file) {
+		return file.getName().replaceAll(".vcf", "");
+	}
+
+	private List<VCard> loadCards(List<String> lines) {
+		List<VCard> result = new ArrayList<>();
+
+		int i = 0;
+		while (i < lines.size()) {
+			if (lines.get(i).equals(LINE_START)) {
+				List<String> vCard = new ArrayList<>();
+				while ((i < lines.size()) && (!lines.get(i).equals(LINE_FINISH))) {
+					vCard.add(lines.get(i));
+					i++;
+				}
+				if (lines.get(i).equals(LINE_FINISH)) {
+					vCard.add(lines.get(i));
+					result.add(new VCard(vCard));
+				}
+			}
+			i++;
+		}
+		System.out.println(String.format(CARDS_RECOGNISED, result.size()));
+		return result;
+	}
+
+	private String getFileNumber(int currentNumber, int AllNumbers) {
+		StringBuilder result = new StringBuilder();
+		int countDigits = Integer.toString(AllNumbers).length();
+		int currentCountDigits = Integer.toString(currentNumber).length();
+		for (int i = 0; i < countDigits - currentCountDigits; i++) {
+			result.append("0");
+		}
+		result.append(Integer.toString(currentNumber));
+		return result.toString();
+	}
+
 	public void load(String fileName) {
 		File file = new File(fileName);
 
@@ -53,32 +90,6 @@ public class VCardFile {
 		}
 	}
 
-	private String getFolderName(File file) {
-		return file.getName().replaceAll(".vcf", "");
-	}
-
-	private List<VCard> loadCards(List<String> lines) {
-		List<VCard> result = new ArrayList<>();
-
-		int i = 0;
-		while (i < lines.size()) {
-			if (lines.get(i).equals(LINE_START)) {
-				List<String> vCard = new ArrayList<>();
-				while ((i < lines.size()) && (!lines.get(i).equals(LINE_FINISH))) {
-					vCard.add(lines.get(i));
-					i++;
-				}
-				if (lines.get(i).equals(LINE_FINISH)) {
-					vCard.add(lines.get(i));
-					result.add(new VCard(vCard));
-				}
-			}
-			i++;
-		}
-		System.out.println(String.format(CARDS_RECOGNISED, result.size()));
-		return result;
-	}
-
 	public List<VCard> getVCards() {
 		return vCards;
 	}
@@ -89,7 +100,8 @@ public class VCardFile {
 
 	public void save() {
 		for (int i = 0; i < getVCards().size(); i++) {
-			getVCards().get(i).save("./" + folderName + "/vCardSplit" + (i + 1) + ".vcf");
+			getVCards().get(i)
+					.save("./" + folderName + "/vCardSplit" + getFileNumber(i + 1, getVCards().size()) + ".vcf");
 		}
 		System.out.println(String.format(CARDS_SAVED, getVCards().size()));
 	}
